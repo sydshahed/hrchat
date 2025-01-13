@@ -15,15 +15,15 @@ from azure.search.documents.indexes import SearchIndexClient
 logger = get_logger(__name__)
 tracer = trace.get_tracer(__name__)
 
-search_service_name = os.environ["SEARCH_SERVICE_NAME"]
-resource_group_name = os.environ["RESOURCE_GROUP_NAME"]
-search_index_name = os.environ["AISEARCH_INDEX_NAME"]
-search_endpoint = f"https://{search_service_name}.search.windows.net"
-search_api_key = os.environ["SEARCH_API_KEY"]
+search_service_name = "hr-chat-bot-ai-service"
+resource_group_name = "rg-skareem-1117_ai"
+search_index_name = "document-search-index"
+search_endpoint = "https://{search_service_name}.search.windows.net"
+search_api_key = "4u8jrjcalHxJw6NpqyoUCzHLOosfVTWlLrGH6FUGrRAzSeBHU1Yg"
 
 # create a project client using environment variables loaded from the .env file
 project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
+    conn_str='eastus2.api.azureml.ms;8c32c53b-6704-4041-aafb-7e31768d289c;rg-skareem-1117_ai;HR_CHAT_BOT', credential=DefaultAzureCredential()
 )
 
 # create a vector embeddings client that will be used to generate vector embeddings
@@ -42,7 +42,7 @@ search_index_client = SearchIndexClient(
 # Create a search index client using the search connection
 # This client will be used to create and delete search indexes
 search_client = SearchClient(
-    index_name=os.environ["AISEARCH_INDEX_NAME"],
+    index_name="document-search-index",
     endpoint=search_connection.endpoint_url,
     credential=AzureKeyCredential(key=search_connection.key),
 )
@@ -63,7 +63,7 @@ def get_product_documents(messages: list, context: dict = None) -> dict:
     print("Created messages:",messages)
 
     intent_mapping_response = chat.complete(
-        model=os.environ["INTENT_MAPPING_MODEL"],
+        model="gpt-4o-mini",
         messages=messages
         # **intent_prompty.parameters,
     )
@@ -74,7 +74,7 @@ def get_product_documents(messages: list, context: dict = None) -> dict:
     logger.debug(f"🧠 Intent mapping: {search_query}")
 
     # generate a vector representation of the search query
-    embedding = embeddings.embed(model=os.environ["EMBEDDINGS_MODEL"], input=search_query)
+    embedding = embeddings.embed(model="text-embedding-ada-002", input=search_query)
     search_vector = embedding.data[0].embedding
 
     # search the index for products matching the search query
