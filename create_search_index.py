@@ -32,7 +32,7 @@ logger = get_logger(__name__)
 
 # Create a project client using environment variables
 project = AIProjectClient.from_connection_string(
-    conn_str=os.environ["AIPROJECT_CONNECTION_STRING"], credential=DefaultAzureCredential()
+    conn_str='eastus2.api.azureml.ms;8c32c53b-6704-4041-aafb-7e31768d289c;rg-skareem-1117_ai;HR_CHAT_BOT', credential=DefaultAzureCredential()
 )
 
 # Create an embeddings client
@@ -149,10 +149,10 @@ def create_index_from_csv(index_name, csv_file):
     except Exception:
         pass
 
-    index_definition = create_index_definition(index_name, model=os.environ["EMBEDDINGS_MODEL"])
+    index_definition = create_index_definition(index_name, model="text-embedding-ada-002")
     index_client.create_index(index_definition)
 
-    docs = create_docs_from_csv(path=csv_file, content_column="description", model=os.environ["EMBEDDINGS_MODEL"])
+    docs = create_docs_from_csv(path=csv_file, content_column="description", model="text-embedding-ada-002")
 
     search_client = SearchClient(
         endpoint=search_connection.endpoint_url,
@@ -172,7 +172,7 @@ if __name__ == "__main__":
         "--index-name",
         type=str,
         help="Index name to use when creating the AI Search index",
-        default=os.environ["AISEARCH_INDEX_NAME"],
+        default=os.environ["document-search-index"],
     )
     parser.add_argument(
         "--csv-file", type=str, help="Path to data for creating search index", default="assets/products.csv"
